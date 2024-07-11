@@ -1,34 +1,40 @@
-# Osmosis Send Receive Contract
+Let's improve the documentation further by adding more details, organizing sections better, and ensuring clarity throughout the process.
 
-This is a simple script to send message from osmosis to avalanche
+# Send Message from Cosmos to EVM
+
+This project demonstrates how to send a message from Osmosis to Avalanche.
 
 ## Prerequisites
 
-1. Get osmosisd CLI from [here](https://docs.osmosis.zone/osmosis-core/osmosisd)
+### 1. Install `osmosisd` CLI
 
-You may need to build from source if the wizard does not work.
+Download and install the `osmosisd` CLI by following the instructions [here](https://docs.osmosis.zone/osmosis-core/osmosisd).
 
-```
+If the installation wizard does not work, build from source using the following commands:
+
+```bash
 git clone https://github.com/osmosis-labs/osmosis.git
 cd osmosis
 make build
-sudo cp build/osmosisd /usr/local/bin
 ```
 
-2. Copy `.osmosisd/client.toml` to `~/.osmosisd/client.toml`
-3. Create a Wallet
+### 2. Create a Wallet
+
+If you don't have a wallet yet, create one using the following command:
 
 ```bash
 osmosisd keys add wallet
 ```
 
-4. Get some test tokens
+### 3. Obtain Test Tokens
 
-Go to the faucet and get some test tokens: https://faucet.testnet.osmosis.zone/
+Get some test tokens from the Osmosis Testnet Faucet: [Osmosis Testnet Faucet](https://faucet.testnet.osmosis.zone/)
 
-## Deploy contract
+## Deploy the Contract
 
-### 1. Build the contract
+### 1. Build the Contract
+
+Navigate to the `wasm` folder and build the contract using Docker:
 
 ```bash
 docker run --rm -v "$(pwd)":/code \
@@ -37,31 +43,55 @@ docker run --rm -v "$(pwd)":/code \
   cosmwasm/rust-optimizer:0.12.13
 ```
 
-### 2. Upload and init the contract
+### 2. Upload and Initialize the Contract
+
+#### Upload the Contract
+
+Use the following command to upload the contract:
 
 ```bash
-osmosisd tx wasm store ./artifacts/send_receive.wasm --from wallet --gas-prices 0.4uosmo --gas auto --gas-adjustment 1.5 -y -b sync --output json
+osmosisd tx wasm store ./artifacts/send_receive.wasm --from wallet --gas-prices 0.4uosmo --gas auto --gas-adjustment 1.5 -y -b sync --output json --node https://rpc.osmotest5.osmosis.zone:443 --chain-id osmo-test-5
 ```
 
-Check the codeId on mintscan, and replace the codeId in the following command
+#### Initialize the Contract
+
+Instantiate the contract with this command:
 
 ```bash
 osmosisd tx wasm instantiate <codeId> '{"channel":"channel-4118"}' --from wallet --label "send_receive" --gas-prices 0.1uosmo --gas auto --gas-adjustment 1.3 --no-admin -y -b sync --output json
 ```
 
-### 3. Create .env
+Replace `<codeId>` with the actual code ID of your transaction. To find the code ID, check [Mintscan](https://www.mintscan.io/) and replace `<codeId>` accordingly.
+
+### 3. Create `.env` File
+
+Navigate to the root folder and create a `.env` file:
+
+```bash
+touch .env
+```
+
+Add the private key of your EVM address to the `.env` file:
 
 ```
-MNEMONIC="your mnemonic"
+PRIVATE_KEY="your private key"
 ```
 
-### 4. Run the script
+### 4. Run the Script
+
+Run the script using the following command:
 
 ```bash
 node index.js
 ```
 
-# Useful Resources
+## Useful Resources
 
-- Faucet: https://faucet.testnet.osmosis.zone/
-- Explorer: https://mintscan.io/osmosis-testnet
+- [Osmosis Testnet Faucet](https://faucet.testnet.osmosis.zone/)
+- [Osmosis Testnet Explorer](https://mintscan.io/osmosis-testnet)
+
+### Notes
+
+- Ensure you have Docker installed for building the contract.
+- Replace placeholder values (e.g., `<codeId>`, `"your private key"`) with actual values specific to your setup.
+- For any issues during the deployment or execution, refer to the official documentation or community forums for support.
