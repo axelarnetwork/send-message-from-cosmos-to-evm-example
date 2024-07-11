@@ -1,5 +1,3 @@
-Let's improve the documentation further by adding more details, organizing sections better, and ensuring clarity throughout the process.
-
 # Send Message from Cosmos to EVM
 
 This project demonstrates how to send a message from Osmosis to Avalanche.
