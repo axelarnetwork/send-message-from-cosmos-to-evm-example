@@ -1,15 +1,12 @@
 require("dotenv").config();
 const { GasPrice } = require("@cosmjs/stargate");
 const { SigningCosmWasmClient } = require("@cosmjs/cosmwasm-stargate");
-const { AxelarQueryAPI } = require("@axelar-network/axelarjs-sdk");
 const { DirectSecp256k1Wallet } = require("@cosmjs/proto-signing");
 const { fromHex } = require("@cosmjs/encoding");
 
 // Environment and API settings
 const privateKey = process.env.PRIVATE_KEY;
 const rpcEndpoint = "https://rpc.osmotest5.osmosis.zone";
-const chainId = "osmosis-7";
-const testnetEnvironment = "testnet";
 
 // Token and contract details
 const aUSDC =
@@ -18,11 +15,6 @@ const osmoDenom = "uosmo";
 const gasPriceString = `0.4${osmoDenom}`;
 const wasmContractAddress =
   "osmo1vqgrchlfuymkjrzmrjznpam3xtzfemthzue43yt8l4ug046rtvwqarcl8r";
-
-// Message details
-const destinationChain = "Avalanche";
-const destinationAddress = "0x113BD07720a5Ae9104C5d54fBDfA83F792afc8e0"; // Avalanche address
-const messageToSend = "Hello from Osmosis!";
 
 (async () => {
   try {
@@ -54,61 +46,11 @@ const messageToSend = "Hello from Osmosis!";
     console.log(`aUSDC balance: ${balanceUsdc.amount / 1e6} aUSDC`);
     console.log(`Osmo balance: ${balanceOsmo.amount / 1e6} OSMO\n`);
 
-    // Estimate gas fee
-    const api = new AxelarQueryAPI({ environment: testnetEnvironment });
-    const gasAmount = await api.estimateGasFee(
-      chainId,
-      destinationChain,
-      100000,
-      "auto",
-      "aUSDC"
-    );
-    console.log(`Estimated gas fee: ${parseInt(gasAmount) / 1e6} aUSDC`);
-
-    // Check for sufficient balances
-    if (balanceUsdc.amount < gasAmount) {
-      console.error("Insufficient aUSDC balance to pay for gas fee");
-      return process.exit(0);
-    }
-
-    if (balanceOsmo.amount < 1e6) {
-      console.error("Insufficient OSMO balance to pay for gas fee");
-      return process.exit(0);
-    }
-
     // Query message from the osmosis contract
     const response = await client.queryContractSmart(wasmContractAddress, {
       get_stored_message: {},
     });
     console.log("Message from Osmosis contract:", response.message);
-
-    // Prepare payload to send message to osmosis contract
-    const payload = {
-      send_message_evm: {
-        destination_chain: destinationChain,
-        destination_address: destinationAddress,
-        message: messageToSend,
-      },
-    };
-
-    const fee = {
-      amount: gasAmount,
-      denom: aUSDC,
-    };
-
-    console.log("Sending message to Osmosis contract...");
-
-    // Execute transaction
-    const result = await client.execute(
-      address,
-      wasmContractAddress,
-      payload,
-      "auto",
-      undefined,
-      [fee]
-    );
-
-    console.log("Sent:", result.transactionHash);
   } catch (error) {
     console.error("An error occurred:", error);
   }
