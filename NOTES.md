@@ -1,0 +1,2 @@
+WASM Contract Address: osmo1lh6wpvmwmvtn04el2veamxytvmfqluxqjs364a06fxg37yhn3qhs7ckzp2
+EVM Contract Address: 0x758efcd3E3C2BA17B87D0Be5F7f42531E456fa07
