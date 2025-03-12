@@ -9,6 +9,7 @@ import {StringToAddress, AddressToString} from "@axelar-network/axelar-gmp-sdk-s
 contract SendReceive is AxelarExecutable {
     using StringToAddress for string;
     using AddressToString for address;
+    event Log(string message);
 
     IAxelarGasService public immutable gasService;
     string public chainName; // name of the chain this contract is deployed to
@@ -34,24 +35,46 @@ contract SendReceive is AxelarExecutable {
         string calldata destinationAddress,
         string calldata message
     ) external payable {
+        emit Log("Send function started");
         // 1. Generate GMP payload
         bytes memory executeMsgPayload = abi.encode(
             msg.sender.toString(),
             message
         );
+        emit Log("Payload encoded");
         bytes memory payload = _encodePayloadToCosmWasm(executeMsgPayload);
+        emit Log("CosmWasm payload encoded");
 
         // 2. Pay for gas
-        gasService.payNativeGasForContractCall{value: msg.value}(
-            address(this),
-            destinationChain,
-            destinationAddress,
-            payload,
-            msg.sender
-        );
+        try
+            gasService.payNativeGasForContractCall{value: msg.value}(
+                address(this),
+                destinationChain,
+                destinationAddress,
+                payload,
+                msg.sender
+            )
+        {
+            emit Log("Gas payment successful");
+        } catch {
+            emit Log("Gas payment failed");
+            return;
+        }
 
         // 3. Make GMP call
-        gateway().callContract(destinationChain, destinationAddress, payload);
+        try
+            gateway().callContract(
+                destinationChain,
+                destinationAddress,
+                payload
+            )
+        {
+            emit Log("Contract call successful");
+        } catch {
+            emit Log("Contract call failed");
+        }
+
+        emit Log("Send function completed");
     }
 
     function _encodePayloadToCosmWasm(
