@@ -2,3 +2,19 @@ node_modules
 .env
 artifacts
 target
+.qodo
+
+# Hardhat files
+evm/cache
+evm/artifacts
+
+# TypeChain files
+evm/typechain
+evm/typechain-types
+
+# solidity-coverage files
+evm/coverage
+evm/coverage.json
+
+# Hardhat Ignition default folder for deployments against a local node
+evm/ignition/deployments

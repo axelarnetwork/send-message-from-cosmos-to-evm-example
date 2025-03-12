@@ -1,0 +1,2 @@
+- EVM Contract(`evm/contracts/SendReceive.sol`) Address: `0xe0f72541FF39c92AFCF518FE1b2b77358D75F1d1`
+- Osmosis CosmWasm Contract(`wasm/src/contract.rs`) Address: `osmo1lh6wpvmwmvtn04el2veamxytvmfqluxqjs364a06fxg37yhn3qhs7ckzp2`
