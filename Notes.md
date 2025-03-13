@@ -1,7 +1,7 @@
 ## EVM Contract(`evm/contracts/SendReceive.sol`)
 
-- [SnowTrace](https://testnet.snowtrace.io/address/0x5A3A4B354FDc3723db3eDFf2Fd1D2F6a85739b06)
-- Contract Address: `0x5A3A4B354FDc3723db3eDFf2Fd1D2F6a85739b06`
+- [SnowTrace](https://testnet.snowtrace.io/address/0xD8D2D41974069C1c79d33bd339dBD5c6941Bd80f)
+- Contract Address: `0xD8D2D41974069C1c79d33bd339dBD5c6941Bd80f`
 
 ## Osmosis CosmWasm Contract(`wasm/src/contract.rs`)
 

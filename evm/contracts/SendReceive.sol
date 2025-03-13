@@ -32,17 +32,18 @@ contract SendReceive is AxelarExecutable {
 
     function send(
         string calldata destinationChain,
+        string calldata destinationChannel,
+        string calldata destinationAgoricAddress,
         string calldata destinationAddress,
         string calldata message
     ) external payable {
         emit Log("Send function started");
         // 1. Generate GMP payload
-        bytes memory executeMsgPayload = abi.encode(
-            msg.sender.toString(),
+        bytes memory payload = _encodePayloadToCosmWasm(
+            destinationChannel,
+            destinationAgoricAddress,
             message
         );
-        emit Log("Payload encoded");
-        bytes memory payload = _encodePayloadToCosmWasm(executeMsgPayload);
         emit Log("CosmWasm payload encoded");
 
         // 2. Pay for gas
@@ -78,8 +79,10 @@ contract SendReceive is AxelarExecutable {
     }
 
     function _encodePayloadToCosmWasm(
-        bytes memory executeMsgPayload
-    ) internal view returns (bytes memory) {
+        string calldata destinationChannel,
+        string calldata destinationAddress,
+        string memory message
+    ) internal pure returns (bytes memory) {
         // Schema
         //   bytes4  version number (0x00000001)
         //   bytes   ABI-encoded payload, indicating function name and arguments:
@@ -88,26 +91,26 @@ contract SendReceive is AxelarExecutable {
         //     dynamic array of string  argument abi type array
         //     bytes                    abi encoded argument values
 
-        // contract call arguments for ExecuteMsg::receive_message_evm{ source_chain, source_address, payload }
+        // contract call arguments for ExecuteMsg::send_ibc_message_to_agoric{ source_chain, source_address, payload }
         bytes memory argValues = abi.encode(
-            chainName,
-            address(this).toString(),
-            executeMsgPayload
+            destinationChannel,
+            destinationAddress,
+            message
         );
 
         string[] memory argumentNameArray = new string[](3);
-        argumentNameArray[0] = "source_chain";
-        argumentNameArray[1] = "source_address";
-        argumentNameArray[2] = "payload";
+        argumentNameArray[0] = "destination_channel";
+        argumentNameArray[1] = "destination_address";
+        argumentNameArray[2] = "message";
 
         string[] memory abiTypeArray = new string[](3);
         abiTypeArray[0] = "string";
         abiTypeArray[1] = "string";
-        abiTypeArray[2] = "bytes";
+        abiTypeArray[2] = "string";
 
         bytes memory gmpPayload;
         gmpPayload = abi.encode(
-            "receive_message_evm",
+            "send_ibc_message_to_agoric",
             argumentNameArray,
             abiTypeArray,
             argValues

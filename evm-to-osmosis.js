@@ -12,9 +12,15 @@ const getSigner = () => {
 };
 
 const RPC_URL = 'https://api.avax-test.network/ext/bc/C/rpc';
-const contractAddress = '0x5A3A4B354FDc3723db3eDFf2Fd1D2F6a85739b06';
+const contractAddress = '0xD8D2D41974069C1c79d33bd339dBD5c6941Bd80f';
 const contractABI = [
-  'function send(string calldata destinationChain, string calldata destinationAddress, string calldata message) external payable',
+  `function send(
+    string calldata destinationChain, 
+    string calldata destinationChannel,
+    string calldata destinationAgoricAddress,
+    string calldata destinationAddress, 
+    string calldata message
+  ) external payable`,
 ];
 
 const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
@@ -23,12 +29,16 @@ const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
 const sendMessage = async ({
   destinationChain,
+  destinationChannel,
+  destinationAgoricAddress,
   destinationAddress,
   message,
 }) => {
   try {
     const tx = await contract.send(
       destinationChain,
+      destinationChannel,
+      destinationAgoricAddress,
       destinationAddress,
       message,
       {
@@ -47,7 +57,10 @@ const sendMessage = async ({
 
 sendMessage({
   destinationChain: 'osmosis-7',
+  destinationChannel: 'channel-10241',
   destinationAddress:
     'osmo1nr7p004vkczdaczx50gyhh39xmuj37y6gtcn9rs56nq70dq2eqqs6chjp2',
+  destinationAgoricAddress:
+    'agoric1h2w0ca85wmjrpee9skwvrt8d2a85jjnh6r3wcvy25asxckhqh7nqjgp3jy',
   message: 'Hello from Avalanche',
 });
