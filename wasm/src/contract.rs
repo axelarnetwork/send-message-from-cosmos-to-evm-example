@@ -1,6 +1,10 @@
 #[cfg(not(feature = "library"))]
-use cosmwasm_std::{to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{
+    to_binary, BankMsg, Binary, Coin, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response,
+    StdResult,
+};
 use ethabi::{decode, encode, ParamType, Token};
+use osmosis_std::types::cosmos::base::v1beta1::Coin as OsmosisCoin;
 use serde_json_wasm::to_string;
 
 // use cw2::set_contract_version;
@@ -206,12 +210,27 @@ mod exec {
         let mut message_payload: Vec<u8> = vec![0, 0, 0, 2];
         message_payload.extend(utf8_vec);
 
-        let coin: cosmwasm_std::Coin = cw_utils::one_coin(&info).unwrap();
+        let denom =
+            "ibc/D7AE93049A211DB828511F3DC3FEA9EA38519A64019C99619E6D526E0EDBE808".to_string();
+        let amount = 1_000u128.into();
+
+        let withdraw_msg: CosmosMsg = CosmosMsg::Bank(BankMsg::Send {
+            to_address: env.contract.address.to_string(),
+            amount: vec![Coin {
+                denom: denom.clone(),
+                amount,
+            }],
+        });
+
+        let ibc_token = OsmosisCoin {
+            denom: denom.clone(),
+            amount: amount.to_string(), // `osmosis_std::Coin` likely requires `String` for amount
+        };
 
         let ibc_message = crate::ibc::MsgTransfer {
             source_port: "transfer".to_string(),
             source_channel: destination_channel,
-            token: Some(coin.into()),
+            token: Some(ibc_token),
             sender: env.contract.address.to_string(),
             receiver: destination_address,
             timeout_height: None,

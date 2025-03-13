@@ -7,7 +7,7 @@ const rpcEndpoint = 'https://rpc.osmotest5.osmosis.zone';
 const osmoDenom = 'uosmo';
 const gasPriceString = `0.4${osmoDenom}`;
 const wasmContractAddress =
-  'osmo1nr7p004vkczdaczx50gyhh39xmuj37y6gtcn9rs56nq70dq2eqqs6chjp2';
+  'osmo158xxa5mwqe5ehnjmx2nwa2gmlep3wqfufnr7aapw2cga4v6tp60qwt28sy';
 
 const getSigner = async () => {
   const mnemonic = process.env.MNEMONIC;
