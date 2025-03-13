@@ -27,6 +27,11 @@ pub enum ExecuteMsg {
         source_address: String,
         payload: Binary,
     },
+    SendMessageAgoric {
+        destination_channel: String,
+        destination_address: String,
+        message: String,
+    },
 }
 
 #[cw_serde]

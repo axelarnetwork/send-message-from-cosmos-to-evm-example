@@ -63,6 +63,18 @@ pub fn execute(
             destination_address,
             message,
         ),
+        SendMessageAgoric {
+            destination_channel,
+            destination_address,
+            message,
+        } => exec::send_ibc_message_to_agoric(
+            deps,
+            env,
+            info,
+            destination_channel,
+            destination_address,
+            message,
+        ),
         ReceiveMessageEvm {
             source_chain,
             source_address,
@@ -169,6 +181,42 @@ mod exec {
             timeout_height: None,
             timeout_timestamp: Some(env.block.time.plus_seconds(604_800u64).nanos()),
             memo: to_string(&gmp_message).unwrap(),
+        };
+
+        Ok(Response::new().add_message(ibc_message))
+    }
+
+    pub fn send_ibc_message_to_agoric(
+        deps: DepsMut,
+        env: Env,
+        info: MessageInfo,
+        destination_channel: String,
+        destination_address: String,
+        message: String,
+    ) -> Result<Response, ContractError> {
+        let contract_call = serde_json_wasm::to_string(&ExecuteMsg::ReceiveMessageCosmos {
+            sender: info.sender.to_string(),
+            message,
+        })
+        .expect("Failed to serialize struct to JSON");
+
+        let utf8_bytes = contract_call.as_bytes();
+        let utf8_vec = utf8_bytes.to_owned();
+
+        let mut message_payload: Vec<u8> = vec![0, 0, 0, 2];
+        message_payload.extend(utf8_vec);
+
+        let coin: cosmwasm_std::Coin = cw_utils::one_coin(&info).unwrap();
+
+        let ibc_message = crate::ibc::MsgTransfer {
+            source_port: "transfer".to_string(),
+            source_channel: destination_channel,
+            token: Some(coin.into()),
+            sender: env.contract.address.to_string(),
+            receiver: destination_address,
+            timeout_height: None,
+            timeout_timestamp: Some(env.block.time.plus_seconds(604_800u64).nanos()),
+            memo: to_string(&message_payload).unwrap(),
         };
 
         Ok(Response::new().add_message(ibc_message))

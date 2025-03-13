@@ -48,6 +48,6 @@ const sendMessage = async ({
 sendMessage({
   destinationChain: 'osmosis-7',
   destinationAddress:
-    'osmo1lh6wpvmwmvtn04el2veamxytvmfqluxqjs364a06fxg37yhn3qhs7ckzp2',
+    'osmo1nr7p004vkczdaczx50gyhh39xmuj37y6gtcn9rs56nq70dq2eqqs6chjp2',
   message: 'Hello from Avalanche',
 });
